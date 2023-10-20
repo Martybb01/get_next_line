@@ -6,16 +6,17 @@
 /*   By: marboccu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/18 23:53:43 by marboccu          #+#    #+#             */
-/*   Updated: 2023/10/20 13:47:31 by marboccu         ###   ########.fr       */
+/*   Updated: 2023/10/20 17:57:14 by marboccu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef GET_NEXT_LINE_H
-#define GET_NETX_LINE_H
+#define GET_NEXT_LINE_H
 
 #include <stdlib.h>
 #include <fcntl.h>
 #include <stdio.h>
+#include <unistd.h>
 
 #ifndef BUFFER_SIZE
 #define BUFFER_SIZE 5
