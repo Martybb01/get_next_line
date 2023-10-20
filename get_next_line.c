@@ -6,14 +6,15 @@
 /*   By: marboccu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/18 23:41:52 by marboccu          #+#    #+#             */
-/*   Updated: 2023/10/20 14:56:28 by marboccu         ###   ########.fr       */
+/*   Updated: 2023/10/20 17:33:51 by marboccu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 
 /* usa: read, free, ft_strdup, ft_strjoin, ft_strchr.
-    Ritorna una linea letta da un file descriptor */
+    Ritorna una linea letta da un file descriptor.
+    * Se la funzione è troppo lunga, creare una custom free_strjoin richiamando dentro strjoin e free */
 static char *riempi_buffer(int fd, char *linea_letta, char *buffer)
 {
     ssize_t bytes_letti;
@@ -52,25 +53,38 @@ static char *riempi_buffer(int fd, char *linea_letta, char *buffer)
     return (linea_letta);
 }
 
-/* prende il line_buffer come parametro, e lo legge finchè non trova il carattere \n o \0, ossia la fine della linea o la fine del file.
-Setta il line_buffer a \0 alla fine della linea e ritorna una sottostringa del buffer dalla fine della linea alla fine del buffer.
-Questa sottostringa è ritornata come left_c */
-// char *set_line(char *line_buffer)
-// {
-//     int i;
-//     char *left_c;
+/* usa ft_substr, ft_strlen, free  */
+char *genera_linea(char *line_buffer)
+{
+    ssize_t i;
+    char *linea_letta;
 
-//     i = 0;
-//     while (line_buffer[i] != '\n' && line_buffer[i] != '\0')
-//         i++;
+    i = 0;
+    /* trova la fine della linea */
+    while (line_buffer[i] != '\n' && line_buffer[i] != '\0')
+        i++;
+    /* se il char corrente o il prox è \0 non c'è next line (linea è vuota) */
+    if (line_buffer[i] == '\0' || line_buffer[1] == '\0')
+    {
+        return (NULL);
+    }
+    /* crea sottostringa da fine di stringa_letta a fine di line_buffer */
+    linea_letta = ft_substr(linea_letta, i + 1, ft_strlen(line_buffer) - i);
+    if (linea_letta == 0)
+    {
+        free(linea_letta);
+        linea_letta = NULL;
+    }
+    linea_letta[i + 1] = '\0';
+    return (linea_letta);
+}
 
-// }
-
-// char *get_next_line(int fd)
-// {
-//     static char *save;
-//     char *buffer;
-// }
+char *get_next_line(int fd)
+{
+    static char *save;
+    char *buffer;
+    char *linea;
+}
 
 int main()
 {
