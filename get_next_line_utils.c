@@ -6,7 +6,7 @@
 /*   By: marboccu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/18 23:53:52 by marboccu          #+#    #+#             */
-/*   Updated: 2023/10/21 11:56:19 by marboccu         ###   ########.fr       */
+/*   Updated: 2023/10/21 14:30:26 by marboccu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -106,22 +106,4 @@ char *ft_strchr(char *s, int c)
     if (s[i] == carattere)
         return ((char *)s + i);
     return (NULL);
-}
-void *ft_memcpy(void *dest, const void *src, size_t n)
-{
-    size_t i;
-    unsigned char *dest2;
-    unsigned char *src2;
-
-    i = 0;
-    dest2 = (unsigned char *)dest;
-    src2 = (unsigned char *)src;
-    if (dest == NULL && src == NULL)
-        return (NULL);
-    while (i < n)
-    {
-        dest2[i] = src2[i];
-        i++;
-    }
-    return (dest);
 }
