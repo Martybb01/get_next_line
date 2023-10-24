@@ -6,85 +6,73 @@
 /*   By: marboccu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/18 23:41:52 by marboccu          #+#    #+#             */
-/*   Updated: 2023/10/24 12:40:12 by marboccu         ###   ########.fr       */
+/*   Updated: 2023/10/24 20:04:01 by marboccu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 
-// static char *ft_joinfree(char *linea_letta, char *buffer)
-// {
-//     char *temp;
-//     temp = ft_strjoin(linea_letta, buffer);
-//     free(buffer);
-//     return (temp);
-// }
-
 /* usa: read, free, ft_strjoin, ft_strchr, ft_calloc.
     Ritorna una linea letta da un file descriptor. */
-static char *leggi_linea(int fd, char *linea_letta, char *buffer)
+static char *read_fd_line(int fd, char *line_read, char *buffer)
 {
-    ssize_t bytes_letti;
+    ssize_t bytes_read;
+    char *temp;
 
-    if (!linea_letta)
-        linea_letta = ft_calloc(1, sizeof(char));
-    bytes_letti = 1;
-    while (bytes_letti > 0)
+    bytes_read = 1;
+    while (bytes_read > 0 && !ft_strchr(buffer, '\n'))
     {
-        bytes_letti = read(fd, buffer, BUFFER_SIZE);
-
-        if (bytes_letti == -1)
+        bytes_read = read(fd, buffer, BUFFER_SIZE);
+        if (bytes_read == -1)
         {
             free(buffer);
             return (NULL);
         }
-        buffer[bytes_letti] = '\0';
-
-        linea_letta = ft_strjoin(linea_letta, buffer);
-        if (!linea_letta)
+        buffer[bytes_read] = '\0';
+        if (!line_read)
         {
-            free(linea_letta);
-            return (NULL);
+            line_read = ft_calloc(1, sizeof(char));
+            if (!line_read)
+                return (NULL);
         }
-
-        if (ft_strchr(buffer, '\n'))
-            break;
+        temp = line_read;
+        line_read = ft_strjoin(temp, buffer);
+        free(temp);
     }
     free(buffer);
-    return (linea_letta);
+    return (line_read);
 }
 
 /* usa free, ft_calloc  */
-static char *genera_linea(char *line_buffer, char *linea_letta)
+static char *line_creator(char *line_buffer, char *line_read)
 {
     ssize_t i;
     ssize_t len;
 
     i = 0;
     len = 0;
-    /* trova la fine della linea */
     while (line_buffer[i] != '\n' && line_buffer[i])
         i++;
     if (line_buffer[i] == '\n')
         i++;
-    linea_letta = ft_calloc(sizeof(char), i + 1);
-    if (!linea_letta)
+    line_read = ft_calloc(sizeof(char), i + 1);
+    if (!line_read)
         return (NULL);
     while (len < i)
     {
-        linea_letta[len] = line_buffer[len];
+        line_read[len] = line_buffer[len];
         len++;
     }
-    linea_letta[len] = '\0';
-    return (linea_letta);
+    line_read[len] = '\0';
+    return (line_read);
 }
 
 /* usa ft_calloc, ft_strlen, free */
-static char *estrai_nuova_linea(char *line_buffer)
+static char *extract_new_line(char *line_buffer)
 {
     ssize_t i;
     ssize_t len;
-    char *nuova_linea;
+    char *new_line;
 
     i = 0;
     len = 0;
@@ -94,28 +82,28 @@ static char *estrai_nuova_linea(char *line_buffer)
         i++;
     if (line_buffer[i] == '\n')
         i++;
-    nuova_linea = ft_calloc(sizeof(char), ft_strlen(line_buffer) - i + 1);
-    if (!nuova_linea)
+    new_line = ft_calloc(sizeof(char), ft_strlen(line_buffer) - i + 1);
+    if (!new_line)
         return (NULL);
     while (line_buffer[i + len])
     {
-        nuova_linea[len] = line_buffer[i + len];
+        new_line[len] = line_buffer[i + len];
         len++;
     }
     free(line_buffer);
-    nuova_linea[len] = '\0';
-    return (nuova_linea);
+    new_line[len] = '\0';
+    return (new_line);
 }
 
 char *get_next_line(int fd)
 {
     static char *save_buff;
     char *buffer;
-    char *linea_letta;
+    char *line_read;
 
-    linea_letta = NULL;
+    line_read = NULL;
     buffer = ft_calloc(sizeof(char), BUFFER_SIZE + 1);
-    if (read(fd, 0, 0) < 0 || fd < 0 || BUFFER_SIZE < 1)
+    if (read(fd, 0, 0) < 0 || fd < 0 || BUFFER_SIZE < 1 || !buffer)
     {
         free(save_buff);
         free(buffer);
@@ -123,18 +111,16 @@ char *get_next_line(int fd)
         buffer = NULL;
         return (NULL);
     }
-    if (!buffer)
-        return (NULL);
-    save_buff = leggi_linea(fd, save_buff, buffer);
+    save_buff = read_fd_line(fd, save_buff, buffer);
     if (*save_buff == 0)
     {
         free(save_buff);
         save_buff = 0;
         return (save_buff);
     }
-    linea_letta = genera_linea(save_buff, linea_letta);
-    save_buff = estrai_nuova_linea(save_buff);
-    return (linea_letta);
+    line_read = line_creator(save_buff, line_read);
+    save_buff = extract_new_line(save_buff);
+    return (line_read);
 }
 
 int main(void)
@@ -160,7 +146,6 @@ int main(void)
         free(next_line);
         next_line = NULL;
     }
-
     close(fd);
     return (0);
 }
