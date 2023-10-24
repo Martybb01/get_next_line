@@ -6,137 +6,161 @@
 /*   By: marboccu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/18 23:41:52 by marboccu          #+#    #+#             */
-/*   Updated: 2023/10/21 12:54:34 by marboccu         ###   ########.fr       */
+/*   Updated: 2023/10/24 12:26:00 by marboccu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 
-/* crea un altra funzione simile a genera linea che usa substr per salvarsi la parte finale quindi parte da i + 1 e finisce a strlen(s)*/
-
-static char *ft_joinfree(char *buffer, char *linea_letta)
+static char *ft_joinfree(char *linea_letta, char *buffer)
 {
     char *temp;
-    temp = ft_strjoin(buffer, linea_letta);
+    temp = ft_strjoin(linea_letta, buffer);
     free(buffer);
     return (temp);
 }
 
-/* usa: read, free, ft_strdup, ft_strjoin, ft_strchr.
+/* usa: read, free, ft_strjoin, ft_strchr, ft_calloc.
     Ritorna una linea letta da un file descriptor. */
-static char *riempi_buffer(int fd, char *linea_letta, char *buffer)
+static char *riempi_linea(int fd, char *linea_letta, char *buffer)
 {
     ssize_t bytes_letti;
-    // char *temp;
 
+    if (!linea_letta)
+        linea_letta = ft_calloc(1, sizeof(char));
     bytes_letti = 1;
     while (bytes_letti > 0)
     {
-        /* legge fino a BUFFER_SIZE byte da fd e li immagazzina in buffer. Salva i bytes letti della variabile.  */
         bytes_letti = read(fd, buffer, BUFFER_SIZE);
 
-        /* errore nel leggere il file descriptor*/
         if (bytes_letti == -1)
+        {
+            free(buffer);
+            return (NULL);
+        }
+        buffer[bytes_letti] = '\0';
+
+        linea_letta = ft_strjoin(linea_letta, buffer);
+        if (!linea_letta)
         {
             free(linea_letta);
             return (NULL);
         }
-        /* abbiamo letto l'intero file, quindi usciamo dal loop */
-        if (bytes_letti == 0)
-            break;
-        buffer[bytes_letti] = '\0';
 
-        /* condizione vera se è il primo ciclo */
-        if (!linea_letta)
-            linea_letta = ft_strdup(""); // alloca stringa vuota
-        // temp = linea_letta;              // salva puntatore corrente in temp per poterlo liberare dopo
-
-        linea_letta = ft_joinfree(linea_letta, buffer);
-
-        /* è stata letta una linea completa.*/
         if (ft_strchr(buffer, '\n'))
             break;
     }
+    free(buffer);
     return (linea_letta);
 }
 
-/* usa ft_substr, ft_strlen, free  */
-static char *genera_linea(char *line_buffer)
+/* usa free, ft_calloc  */
+static char *genera_linea(char *line_buffer, char *linea_letta)
 {
     ssize_t i;
-    char *linea_letta;
+    ssize_t len;
 
     i = 0;
+    len = 0;
     /* trova la fine della linea */
-    while (line_buffer[i] != '\n' && line_buffer[i] != '\0')
+    while (line_buffer[i] != '\n' && line_buffer[i])
         i++;
-    /* se il char corrente o il prox è \0 non c'è next line (linea è vuota) */
-    if (line_buffer[i] == 0 || line_buffer[i + 1] == 0)
-        return (NULL);
-    /* crea sottostringa da fine di stringa_letta a fine di line_buffer */
-    linea_letta = ft_substr(line_buffer, 0, i + 1);
+    if (line_buffer[i] == '\n')
+        i++;
+    linea_letta = ft_calloc(sizeof(char), i + 1);
     if (!linea_letta)
+        return (NULL);
+    while (len < i)
     {
-        free(linea_letta);
-        linea_letta = NULL;
+        linea_letta[len] = line_buffer[len];
+        len++;
     }
-    // if (line_buffer[i] || line_buffer[i] == '\n')
-    //     linea_letta[i++] = '\n';
-    linea_letta[i + 2] = '\n';
+    linea_letta[len] = '\0';
     return (linea_letta);
+}
+
+/* usa ft_calloc, ft_strlen, free */
+static char *estrai_nuova_linea(char *line_buffer)
+{
+    ssize_t i;
+    ssize_t len;
+    char *nuova_linea;
+
+    i = 0;
+    len = 0;
+    if (!line_buffer)
+        return (NULL);
+    while (line_buffer[i] != '\n' && line_buffer[i])
+        i++;
+    if (line_buffer[i] == '\n')
+        i++;
+    nuova_linea = ft_calloc(sizeof(char), ft_strlen(line_buffer) - i + 1);
+    if (!nuova_linea)
+        return (NULL);
+    while (line_buffer[i + len])
+    {
+        nuova_linea[len] = line_buffer[i + len];
+        len++;
+    }
+    free(line_buffer);
+    nuova_linea[len] = '\0';
+    return (nuova_linea);
 }
 
 char *get_next_line(int fd)
 {
-    static char *save;
+    static char *save_buff;
     char *buffer;
-    char *linea;
+    char *linea_letta;
 
-    buffer = (char *)malloc(sizeof(char) * (BUFFER_SIZE + 1));
-    if (!buffer || fd < 0 || BUFFER_SIZE < 1)
+    linea_letta = NULL;
+    buffer = ft_calloc(sizeof(char), BUFFER_SIZE + 1);
+    if (read(fd, 0, 0) < 0 || fd < 0 || BUFFER_SIZE < 1)
     {
+        free(save_buff);
         free(buffer);
+        save_buff = NULL;
         buffer = NULL;
         return (NULL);
     }
-    linea = riempi_buffer(fd, save, buffer);
-    free(buffer); // non la usiamo più quindi la liberiamo per prevenire memory leaks
-    buffer = NULL;
-    if (!linea)
+    if (!buffer)
         return (NULL);
-    save = genera_linea(linea);
-    if (!save)
-        return (NULL);
-    return (linea);
+    save_buff = riempi_linea(fd, save_buff, buffer);
+    if (*save_buff == 0)
+    {
+        free(save_buff);
+        save_buff = 0;
+        return (save_buff);
+    }
+    linea_letta = genera_linea(save_buff, linea_letta);
+    save_buff = estrai_nuova_linea(save_buff);
+    return (linea_letta);
 }
 
-int main()
+int main(void)
 {
     int fd;
-    char *line;
-    // char *line2;
-    // char *line3;
-    // char *line4;
+    char *next_line;
+    int count;
 
+    count = 0;
     fd = open("test.txt", O_RDONLY);
-    if (fd < 0)
+    if (fd == -1)
     {
-        perror("Error opnening file");
-        return -1;
+        printf("Error opening file\n");
+        return (1);
     }
-    while ((line = get_next_line(fd)) != NULL)
+    while (1)
     {
-        printf("%s\n", line);
-        free(line);
+        next_line = get_next_line(fd);
+        if (!next_line)
+            break;
+        count++;
+        printf("GNL %d: %s", count, next_line);
+        free(next_line);
+        next_line = NULL;
     }
+
     close(fd);
     return (0);
-    // line = get_next_line(fd);
-    // printf("%s\n", line);
-    // line2 = get_next_line(fd);
-    // printf("%s\n", line2);
-    // line3 = get_next_line(fd);
-    // printf("%s\n", line3);
-    // line4 = get_next_line(fd);
-    // printf("%s\n", line4);
 }
