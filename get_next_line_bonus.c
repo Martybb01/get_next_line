@@ -1,16 +1,16 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   get_next_line.c                                    :+:      :+:    :+:   */
+/*   get_next_line_bonus.c                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: marboccu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/10/18 23:41:52 by marboccu          #+#    #+#             */
-/*   Updated: 2023/10/24 23:09:50 by marboccu         ###   ########.fr       */
+/*   Created: 2023/10/24 20:10:17 by marboccu          #+#    #+#             */
+/*   Updated: 2023/10/24 23:06:49 by marboccu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "get_next_line.h"
+#include "get_next_line_bonus.h"
 
 static char	*read_fd_line(int fd, char *line_read, char *buffer)
 {
@@ -41,6 +41,7 @@ static char	*read_fd_line(int fd, char *line_read, char *buffer)
 	return (line_read);
 }
 
+/* usa free, ft_calloc  */
 static char	*line_creator(char *line_buffer, char *line_read)
 {
 	ssize_t	i;
@@ -93,7 +94,7 @@ static char	*extract_new_line(char *line_buffer)
 
 char	*get_next_line(int fd)
 {
-	static char	*save_buff;
+	static char	*save_buff[4096];
 	char		*buffer;
 	char		*line_read;
 
@@ -101,47 +102,50 @@ char	*get_next_line(int fd)
 	buffer = ft_calloc(sizeof(char), BUFFER_SIZE + 1);
 	if (read(fd, 0, 0) < 0 || fd < 0 || BUFFER_SIZE < 1 || !buffer)
 	{
-		free(save_buff);
+		free(save_buff[fd]);
 		free(buffer);
-		save_buff = NULL;
+		save_buff[fd] = NULL;
 		buffer = NULL;
 		return (NULL);
 	}
-	save_buff = read_fd_line(fd, save_buff, buffer);
-	if (*save_buff == 0)
+	save_buff[fd] = read_fd_line(fd, save_buff[fd], buffer);
+	if (*save_buff[fd] == 0)
 	{
-		free(save_buff);
-		save_buff = 0;
-		return (save_buff);
+		free(save_buff[fd]);
+		save_buff[fd] = 0;
+		return (save_buff[fd]);
 	}
-	line_read = line_creator(save_buff, line_read);
-	save_buff = extract_new_line(save_buff);
+	line_read = line_creator(save_buff[fd], line_read);
+	save_buff[fd] = extract_new_line(save_buff[fd]);
 	return (line_read);
 }
 
 // int main(void)
 // {
-//     int fd;
-//     char *next_line;
-//     int count;
+// 	int fd[2];
+// 	char *line;
 
-//     count = 0;
-//     fd = open("test.txt", O_RDONLY);
-//     if (fd == -1)
-//     {
-//         printf("Error opening file\n");
-//         return (1);
-//     }
-//     while (1)
-//     {
-//         next_line = get_next_line(fd);
-//         if (!next_line)
-//             break ;
-//         count++;
-//         printf("GNL %d: %s", count, next_line);
-//         free(next_line);
-//         next_line = NULL;
-//     }
-//     close(fd);
-//     return (0);
+// 	fd[0] = open("test.txt", O_RDONLY);
+// 	fd[1] = open("text.txt", O_RDONLY);
+
+// 	line = get_next_line(fd[0]);
+// 	while (line != NULL)
+// 	{
+// 		printf("file 1: %s", line);
+// 		free(line);
+// 		line = get_next_line(fd[0]);
+// 	}
+
+// 	line = get_next_line(fd[1]);
+// 	while (line != NULL)
+// 	{
+// 		printf("file 2: %s", line);
+// 		free(line);
+// 		line = get_next_line(fd[1]);
+// 	}
+
+// 	close(fd[0]);
+// 	close(fd[1]);
+
+// 	return (0);
 // }

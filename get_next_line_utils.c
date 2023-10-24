@@ -6,7 +6,7 @@
 /*   By: marboccu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/18 23:53:52 by marboccu          #+#    #+#             */
-/*   Updated: 2023/10/24 15:25:56 by marboccu         ###   ########.fr       */
+/*   Updated: 2023/10/24 23:08:32 by marboccu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,24 +20,6 @@ size_t	ft_strlen(char *s)
 	while (s[i])
 		i++;
 	return (i);
-}
-
-char	*ft_strdup(char *s1)
-{
-	char			*s2;
-	unsigned int	i;
-
-	i = 0;
-	s2 = (char *)malloc(sizeof(char) * (ft_strlen(s1) + 1));
-	if (!s2)
-		return (NULL);
-	while (s1[i])
-	{
-		s2[i] = s1[i];
-		i++;
-	}
-	s2[i] = '\0';
-	return (s2);
 }
 
 char	*ft_strjoin(char *s1, char *s2)
