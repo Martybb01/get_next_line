@@ -6,23 +6,23 @@
 /*   By: marboccu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/18 23:41:52 by marboccu          #+#    #+#             */
-/*   Updated: 2023/10/24 12:26:00 by marboccu         ###   ########.fr       */
+/*   Updated: 2023/10/24 12:40:12 by marboccu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 
-static char *ft_joinfree(char *linea_letta, char *buffer)
-{
-    char *temp;
-    temp = ft_strjoin(linea_letta, buffer);
-    free(buffer);
-    return (temp);
-}
+// static char *ft_joinfree(char *linea_letta, char *buffer)
+// {
+//     char *temp;
+//     temp = ft_strjoin(linea_letta, buffer);
+//     free(buffer);
+//     return (temp);
+// }
 
 /* usa: read, free, ft_strjoin, ft_strchr, ft_calloc.
     Ritorna una linea letta da un file descriptor. */
-static char *riempi_linea(int fd, char *linea_letta, char *buffer)
+static char *leggi_linea(int fd, char *linea_letta, char *buffer)
 {
     ssize_t bytes_letti;
 
@@ -125,7 +125,7 @@ char *get_next_line(int fd)
     }
     if (!buffer)
         return (NULL);
-    save_buff = riempi_linea(fd, save_buff, buffer);
+    save_buff = leggi_linea(fd, save_buff, buffer);
     if (*save_buff == 0)
     {
         free(save_buff);

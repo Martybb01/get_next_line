@@ -6,7 +6,7 @@
 /*   By: marboccu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/18 23:53:43 by marboccu          #+#    #+#             */
-/*   Updated: 2023/10/24 12:26:59 by marboccu         ###   ########.fr       */
+/*   Updated: 2023/10/24 12:41:05 by marboccu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@
 #include <unistd.h>
 
 #ifndef BUFFER_SIZE
-#define BUFFER_SIZE 9999
+#define BUFFER_SIZE 42
 #endif
 
 size_t ft_strlen(char *s);
