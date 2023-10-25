@@ -6,7 +6,7 @@
 /*   By: marboccu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/24 20:10:17 by marboccu          #+#    #+#             */
-/*   Updated: 2023/10/25 11:50:16 by marboccu         ###   ########.fr       */
+/*   Updated: 2023/10/25 11:58:37 by marboccu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,7 +40,6 @@ static char	*read_fd_line(int fd, char *line_read, char *buffer)
 	return (line_read);
 }
 
-/* usa free, ft_calloc  */
 static char	*line_creator(char *line_buffer, char *line_read)
 {
 	ssize_t	i;
@@ -117,28 +116,28 @@ char	*get_next_line(int fd)
 	return (line_read);
 }
 
-int	main(void)
-{
-	int		fd[2];
-	char	*line;
+// int	main(void)
+// {
+// 	int		fd[2];
+// 	char	*line;
 
-	fd[0] = open("test.txt", O_RDONLY);
-	fd[1] = open("text.txt", O_RDONLY);
-	line = get_next_line(fd[0]);
-	while (line != NULL)
-	{
-		printf("file 1: %s", line);
-		free(line);
-		line = get_next_line(fd[0]);
-	}
-	line = get_next_line(fd[1]);
-	while (line != NULL)
-	{
-		printf("file 2: %s", line);
-		free(line);
-		line = get_next_line(fd[1]);
-	}
-	close(fd[0]);
-	close(fd[1]);
-	return (0);
-}
+// 	fd[0] = open("test.txt", O_RDONLY);
+// 	fd[1] = open("text.txt", O_RDONLY);
+// 	line = get_next_line(fd[0]);
+// 	while (line != NULL)
+// 	{
+// 		printf("file 1: %s", line);
+// 		free(line);
+// 		line = get_next_line(fd[0]);
+// 	}
+// 	line = get_next_line(fd[1]);
+// 	while (line != NULL)
+// 	{
+// 		printf("file 2: %s", line);
+// 		free(line);
+// 		line = get_next_line(fd[1]);
+// 	}
+// 	close(fd[0]);
+// 	close(fd[1]);
+// 	return (0);
+// }
