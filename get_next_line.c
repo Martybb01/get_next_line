@@ -6,7 +6,7 @@
 /*   By: marboccu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/18 23:41:52 by marboccu          #+#    #+#             */
-/*   Updated: 2023/10/24 23:09:50 by marboccu         ###   ########.fr       */
+/*   Updated: 2023/10/25 11:46:13 by marboccu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,6 @@ static char	*read_fd_line(int fd, char *line_read, char *buffer)
 			free(buffer);
 			return (NULL);
 		}
-		buffer[bytes_read] = '\0';
 		if (!line_read)
 		{
 			line_read = ft_calloc(1, sizeof(char));
@@ -60,7 +59,6 @@ static char	*line_creator(char *line_buffer, char *line_read)
 		line_read[len] = line_buffer[len];
 		len++;
 	}
-	line_read[len] = '\0';
 	return (line_read);
 }
 
@@ -87,7 +85,6 @@ static char	*extract_new_line(char *line_buffer)
 		len++;
 	}
 	free(line_buffer);
-	new_line[len] = '\0';
 	return (new_line);
 }
 
@@ -119,29 +116,29 @@ char	*get_next_line(int fd)
 	return (line_read);
 }
 
-// int main(void)
-// {
-//     int fd;
-//     char *next_line;
-//     int count;
+int	main(void)
+{
+	int		fd;
+	char	*next_line;
+	int		count;
 
-//     count = 0;
-//     fd = open("test.txt", O_RDONLY);
-//     if (fd == -1)
-//     {
-//         printf("Error opening file\n");
-//         return (1);
-//     }
-//     while (1)
-//     {
-//         next_line = get_next_line(fd);
-//         if (!next_line)
-//             break ;
-//         count++;
-//         printf("GNL %d: %s", count, next_line);
-//         free(next_line);
-//         next_line = NULL;
-//     }
-//     close(fd);
-//     return (0);
-// }
+	count = 0;
+	fd = open("test.txt", O_RDONLY);
+	if (fd == -1)
+	{
+		printf("Error opening file\n");
+		return (1);
+	}
+	while (1)
+	{
+		next_line = get_next_line(fd);
+		if (!next_line)
+			break ;
+		count++;
+		printf("GNL %d: %s", count, next_line);
+		free(next_line);
+		next_line = NULL;
+	}
+	close(fd);
+	return (0);
+}
